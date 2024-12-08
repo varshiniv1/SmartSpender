@@ -1,11 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { signout } from '../utils/icons';
 import { menuItems } from '../utils/menuItems';
-import axios from 'axios'; // Import Axios
+import axios from 'axios';
 
 function Navigation() {
     const navigate = useNavigate();
+    const [isDownloading, setIsDownloading] = useState(false); // State for download status
 
     const handleMenuClick = (path) => {
         navigate(path);
@@ -20,24 +21,41 @@ function Navigation() {
     };
 
     const handleDownloadReport = async () => {
-      try {
-          const response = await axios.get('http://localhost:3001/api/report/download-report', {
-              responseType: 'blob', // Ensure response is treated as a binary Blob
-          });
-  
-          // Create a Blob URL for the PDF
-          const url = window.URL.createObjectURL(new Blob([response.data]));
-          const link = document.createElement('a');
-          link.href = url;
-          link.setAttribute('download', 'IncomeExpenseReport.pdf'); // Specify file name
-          document.body.appendChild(link);
-          link.click();
-          link.remove(); // Clean up
+        const token = localStorage.getItem('token'); // Get the token from localStorage
+
+        if (!token) {
+            alert('You must be logged in to download the report.');
+            return;
+        }
+
+        setIsDownloading(true); // Indicate downloading state
+        try {
+            const response = await axios.post(
+                'http://localhost:3001/api/report/download-report',
+                {}, // Empty body
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`, // Include the token in the headers
+                    },
+                    responseType: 'blob', // Ensure response is treated as a binary Blob
+                }
+            );
+
+            // Create a Blob URL for the PDF
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', 'IncomeExpenseReport.pdf'); // Specify file name
+            document.body.appendChild(link);
+            link.click();
+            link.remove(); // Clean up the DOM
         } catch (error) {
-            console.error('Error downloading the report:', error);
+            console.error('Error downloading the report:', error.response?.data || error.message);
+            alert('Failed to download the report. Please try again.');
+        } finally {
+            setIsDownloading(false); // Reset downloading state
         }
     };
-    
 
     return (
         <nav
@@ -71,8 +89,9 @@ function Navigation() {
                 <button
                     className="btn btn-outline-primary"
                     onClick={handleDownloadReport}
+                    disabled={isDownloading} // Disable the button while downloading
                 >
-                    Download Report
+                    {isDownloading ? 'Downloading...' : 'Download Report'}
                 </button>
                 <div
                     className="d-flex align-items-center cursor-pointer btn btn-outline-danger"
