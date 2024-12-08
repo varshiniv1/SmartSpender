@@ -4,6 +4,7 @@ import Orb from './components/Orb';
 import Navigation from './components/Navigation';
 import Dashboard from './components/Dashboard';
 import Income from './components/Income';
+import Budget from './components/Budget';
 import Expenses from './components/Expenses/expenses';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useGlobalContext } from './context/globalContext';
@@ -37,6 +38,7 @@ function App() {
               <Route path="/dashboard" element={token ? <Dashboard /> : <Navigate to="/login" />} />
               <Route path="/income" element={token ? <Income /> : <Navigate to="/login" />} />
               <Route path="/expenses" element={token ? <Expenses /> : <Navigate to="/login" />} />
+              <Route path="/budget" element={token ? <Budget /> : <Navigate to="/login" />} />
             </Routes>
           </main>
         </div>
