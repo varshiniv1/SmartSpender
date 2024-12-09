@@ -21,6 +21,11 @@ const UserSchema = new mongoose.Schema(
             required: true,
             minLength: 6,
         },
+        budget: {
+            type: Number,
+            required: true,
+            default: 10000,
+        },
     },
     { timestamps: true }
 );

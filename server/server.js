@@ -4,6 +4,7 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import router from './routes/index.routes.js';
 import reportRoutes from './routes/report.js'; // Import the report route correctly
+import sendMonthlyReports from './utils/monthlyreports.js';
 
 dotenv.config();
 
@@ -54,3 +55,4 @@ const startServer = async () => {
 
 // Execute the server startup
 startServer();
+sendMonthlyReports();

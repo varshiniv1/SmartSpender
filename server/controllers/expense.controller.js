@@ -1,36 +1,67 @@
 import ExpenseSchema from "../models/Expense.model.js";
+import sendEmail from '../utils/email.js';
+import User from '../models/User.model.js';
+import mongoose from 'mongoose';
+import { ObjectId } from 'mongodb';
+
 
 // Add Expense with User ID
 export const addExpense = async (req, res) => {
     const { title, amount, category, description, date } = req.body;
     const userId = req.user.id;  // Assuming the JWT token is decoded and user info is added to `req.user`
 
-    const expense = new ExpenseSchema({
-        title,
-        amount,
-        category,
-        description,
-        date,
-        user: userId,  // Assign the user ID
-    });
-
     try {
         // Validations
         if (!title || !category || !description || !date) {
             return res.status(400).json({ message: 'All fields are required!' });
         }
-        const amountValue= parseFloat(amount);
+
+        const amountValue = parseFloat(amount);
         if (amountValue <= 0 || isNaN(amountValue)) {
             return res.status(400).json({ message: 'Amount must be a positive number!' });
         }
 
+        // Create and save the expense
+        const expense = new ExpenseSchema({
+            title,
+            amount,
+            category,
+            description,
+            date,
+            user: userId, // Assign the user ID
+        });
         await expense.save();
-        res.status(200).json({ message: 'Expense Added' });
+
+        // Aggregate total expenses for the user
+        const totalExpenses = await ExpenseSchema.aggregate([
+            { $match: { user: new ObjectId(userId) } },
+            { $group: { _id: null, total: { $sum: '$amount' } } },
+        ])
+        console.log('Total Expenses Aggregation Result:', totalExpenses);
+
+        // Get the user's budget
+        const user = await User.findById(userId);
+        const userBudget = user.budget || 10000; // Default to 10,000 if no budget is set
+        const currentExpenses = totalExpenses[0]?.total || 0;
+
+        // Send a budget alert email if expenses exceed 90% of the budget
+        if (currentExpenses >= userBudget * 0.9) {
+            await sendEmail({
+                to: user.email,
+                subject: 'Budget Alert!',
+                text: `You are approaching your budget limit. Your total expenses have reached ${currentExpenses}.`,
+                html: `<p>You are approaching your budget limit. Your total expenses have reached <strong>${currentExpenses}</strong>.</p>`,
+            });
+        }
+
+        // Send the success response
+        res.status(200).json({ message: 'Expense Added', currentExpenses, userBudget });
     } catch (error) {
-        console.error(error);  // Log the error to the console
+        console.error(error); // Log the error to the console
         res.status(500).json({ message: 'Server Error', error: error.message });
     }
 };
+
 
 
 // Get Expenses
