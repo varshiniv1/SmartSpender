@@ -1,17 +1,34 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-const Budget = () => {
+const BudgetSetter = () => {
     const [budget, setBudget] = useState('');
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axios.post('/api/budget', { userId: 'user123', amount: budget });
+            // Retrieve token from localStorage
+            const token = localStorage.getItem('authToken');
+
+            if (!token) {
+                alert('You are not authenticated. Please log in.');
+                return;
+            }
+
+            // Include token in Authorization header
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            };
+
+            // Send the request with headers and budget amount
+            await axios.post('http://localhost:3001/api/v1/budget/set', { amount: budget }, config);
+
             alert('Budget set successfully!');
         } catch (error) {
             console.error('Error saving budget:', error);
-            alert('Failed to save budget');
+            alert('Failed to save budget. Ensure you are logged in.');
         }
     };
 
@@ -79,4 +96,4 @@ const Budget = () => {
     );
 };
 
-export default Budget;
+export default BudgetSetter;

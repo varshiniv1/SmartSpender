@@ -1,25 +1,4 @@
 import Budget from '../models/Budget.model.js';
-import jwt from 'jsonwebtoken';
-import User from '../models/User.model.js';
-
-// Middleware to protect routes
-const protect = async (req, res, next) => {
-    let token;
-
-    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
-        try {
-            token = req.headers.authorization.split(' ')[1];
-            const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-            req.user = await User.findById(decoded.userId).select('-password');
-            next();
-        } catch (error) {
-            res.status(401).json({ message: 'Not authorized, token failed' });
-        }
-    } else {
-        res.status(401).json({ message: 'Not authorized, no token' });
-    }
-};
 
 // Get Budget
 export const getBudget = async (req, res) => {
@@ -62,5 +41,3 @@ export const setBudget = async (req, res) => {
         res.status(500).json({ message: 'Server Error' });
     }
 };
-
-export default protect;

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { act } from 'react';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -25,6 +24,7 @@ const Login = () => {
 
         // Ensure that navigation is performed after storing the token
         navigate('/dashboard');
+        window.location.reload();
       } else {
         setError('Unexpected response from the server. Please try again.');
       }
@@ -43,9 +43,8 @@ const Login = () => {
         <h2 className="text-center mb-4">Login</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
-            <label className="form-label" htmlFor="email">Email</label>
+            <label className="form-label">Email</label>
             <input
-              id="email"
               type="email"
               className="form-control"
               value={email}
@@ -54,9 +53,8 @@ const Login = () => {
             />
           </div>
           <div className="mb-3">
-            <label className="form-label" htmlFor="password">Password</label>
+            <label className="form-label">Password</label>
             <input
-              id="password"
               type="password"
               className="form-control"
               value={password}
