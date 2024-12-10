@@ -24,4 +24,5 @@
 ### Varshini Venkataraman
 - Income
 - Expense
+- Dashboard
 - Backend
