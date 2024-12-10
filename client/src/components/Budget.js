@@ -1,10 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 
 const Budget = () => {
     const [budget, setBudget] = useState('');
-    const [expenses, setExpenses] = useState(0);
-    const [alert, setAlert] = useState('');
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -16,32 +14,6 @@ const Budget = () => {
             alert('Failed to save budget');
         }
     };
-
-    const fetchExpenses = async () => {
-        try {
-            const response = await axios.get('/api/expenses/total', { params: { userId: 'user123' } });
-            setExpenses(response.data.totalExpenses);
-        } catch (error) {
-            console.error('Error fetching expenses:', error);
-        }
-    };
-
-    useEffect(() => {
-        if (budget && expenses > 0) {
-            const budgetValue = parseFloat(budget);
-            if (expenses >= budgetValue) {
-                setAlert('You have exceeded your budget!');
-            } else if (expenses >= budgetValue * 0.8) {
-                setAlert('You are near your budget limit!');
-            } else {
-                setAlert('');
-            }
-        }
-    }, [budget, expenses]);
-
-    useEffect(() => {
-        fetchExpenses();
-    }, []);
 
     return (
         <div
@@ -103,36 +75,6 @@ const Budget = () => {
                     Set Budget
                 </button>
             </form>
-            <div
-                style={{
-                    backgroundColor: '#fff',
-                    padding: '20px',
-                    borderRadius: '10px',
-                    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-                    width: '500px', // Wider box
-                    margin: '20px auto', // Center the box and add spacing
-                    textAlign: 'center',
-                }}
-            >
-                <h2 style={{ color: '#555', fontSize: '24px', fontWeight: 'bold' }}>
-                    Current Expenses: ${expenses}
-                </h2>
-                {alert && (
-                    <p
-                        style={{
-                            marginTop: '10px',
-                            padding: '10px',
-                            backgroundColor: expenses >= budget ? '#F8D7DA' : '#FFF3CD',
-                            color: expenses >= budget ? '#721C24' : '#856404',
-                            border: `1px solid ${expenses >= budget ? '#F5C6CB' : '#FFEEBA'}`,
-                            borderRadius: '5px',
-                            fontWeight: 'bold',
-                        }}
-                    >
-                        {alert}
-                    </p>
-                )}
-            </div>
         </div>
     );
 };
