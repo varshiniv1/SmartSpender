@@ -3,25 +3,34 @@
 ### Debarshiya Chandra
 - Report Feature
 - Documentation
-- Front End
+- Budget
+- Frontend
+- Backend
 
 ### Athulya Anil
 - Budget
 - Documentation
-- Front End
+- Frontend
 - Unit Tests
 
 ### Lavanya Shankar
 - Dashboard
 - Login
+- Register
+- Budget
+- Frontend
 - Backend
 
 ### Kavisha Parikh
 - Email Notifications
 - Monthly Report Generation
+- Frontend Testing
+- Backend Testing
 - Backend
 
 ### Varshini Venkataraman
 - Income
 - Expense
+- Dashboard
+- Budget
 - Backend
