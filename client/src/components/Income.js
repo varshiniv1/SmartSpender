@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useGlobalContext } from '../context/globalContext.js';
 import Form from './Form.js';
 import IncomeItem from './IncomeItem';
+import { act } from 'react';
 
 function Income() {
     const { addIncome, incomes, getIncomes, deleteIncome, totalIncome } = useGlobalContext();

@@ -1,6 +1,7 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 //import Income from "../src/components/Income.js";
 import Income from "../components/Income.js";
+import { act } from 'react';
 
 import { useGlobalContext } from "../../../src/context/globalContext";
 

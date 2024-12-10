@@ -1,42 +1,64 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import Login from '../login';
+import { BrowserRouter as Router } from 'react-router-dom';
+import { act } from 'react';
 
-test('renders login form', () => {
-  render(<Login onLogin={() => {}} />);
-  const emailInput = screen.getByPlaceholderText('Email');
-  const passwordInput = screen.getByPlaceholderText('Password');
-  const button = screen.getByRole('button', { name: /login/i });
+describe('Login Component', () => {
+  let mockOnLogin;
 
-  expect(emailInput).toBeInTheDocument();
-  expect(passwordInput).toBeInTheDocument();
-  expect(button).toBeDisabled();
-});
+  beforeEach(() => {
+    // Mock the onLogin function before each test
+    mockOnLogin = jest.fn();
+  });
 
-test('enables the login button when inputs are filled', () => {
-  const mockOnLogin = jest.fn();
-  render(<Login onLogin={mockOnLogin} />);
+  test('renders login form', () => {
+    render(
+      <Router>
+        <Login onLogin={mockOnLogin} />
+      </Router>
+    );
+    const emailInput = screen.getByLabelText('Email');
+    const passwordInput = screen.getByLabelText('Password');
+    const loginButton = screen.getByRole('button', { name: /login/i });
 
-  const emailInput = screen.getByPlaceholderText('Email');
-  const passwordInput = screen.getByPlaceholderText('Password');
-  const button = screen.getByRole('button', { name: /login/i });
+    expect(emailInput).toBeInTheDocument();
+    expect(passwordInput).toBeInTheDocument();
+    expect(loginButton).toBeDisabled(); // Button initially disabled
+  });
 
-  fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
-  fireEvent.change(passwordInput, { target: { value: 'password123' } });
+  test('enables the login button when inputs are filled', () => {
+    render(
+      <Router>
+        <Login onLogin={mockOnLogin} />
+      </Router>
+    );
+    const emailInput = screen.getByLabelText('Email');
+    const passwordInput = screen.getByLabelText('Password');
+    const loginButton = screen.getByRole('button', { name: /login/i });
 
-  expect(button).not.toBeDisabled();
-});
+    // Simulate user input
+    fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
+    fireEvent.change(passwordInput, { target: { value: 'password123' } });
 
-test('calls onLogin when form is submitted', () => {
-  const mockOnLogin = jest.fn();
-  render(<Login onLogin={mockOnLogin} />);
+    expect(loginButton).not.toBeDisabled(); // Button enabled when inputs are valid
+  });
 
-  const emailInput = screen.getByPlaceholderText('Email');
-  const passwordInput = screen.getByPlaceholderText('Password');
-  const button = screen.getByRole('button', { name: /login/i });
+  test('calls onLogin when form is submitted', () => {
+    render(
+      <Router>
+        <Login onLogin={mockOnLogin} />
+      </Router>
+    );
+    const emailInput = screen.getByLabelText('Email');
+    const passwordInput = screen.getByLabelText('Password');
+    const loginButton = screen.getByRole('button', { name: /login/i });
 
-  fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
-  fireEvent.change(passwordInput, { target: { value: 'password123' } });
-  fireEvent.click(button);
+    // Simulate user input and form submission
+    fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
+    fireEvent.change(passwordInput, { target: { value: 'password123' } });
+    fireEvent.click(loginButton);
 
-  expect(mockOnLogin).toHaveBeenCalledWith('test@example.com', 'password123');
+    // Verify onLogin is called with correct arguments
+    expect(mockOnLogin).toHaveBeenCalledWith('test@example.com', 'password123');
+  });
 });

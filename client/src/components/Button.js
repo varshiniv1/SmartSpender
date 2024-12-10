@@ -1,4 +1,5 @@
 import React from 'react';
+import { act } from 'react';
 
 function Button({ name, icon, onClick, variant, size, bRad }) {
     // Bootstrap button variant (e.g., "primary", "secondary", etc.)

@@ -1,6 +1,7 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import Button from "../components/Button";
 import { cleanup } from "@testing-library/react";
+import { act } from 'react';
 
 afterEach(cleanup);
 afterEach(() => {
