@@ -56,3 +56,4 @@ const startServer = async () => {
 // Execute the server startup
 startServer();
 sendMonthlyReports();
+export default app;
