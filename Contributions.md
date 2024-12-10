@@ -1,14 +1,5 @@
 # Team Contribution Report
 
-## Team Members
-- **Athulya Anil**
-- **Debarshiya Chandra**
-- **Kavisha Parikh**
-- **Lavanya Shankar**
-- **Varshini Venkataraman**
-
-## Contributions
-
 ### Debarshiya Chandra
 - Report Feature
 - Documentation
