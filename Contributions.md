@@ -8,6 +8,7 @@
 ### Athulya Anil
 - Budget
 - Documentation
+- Front End
 - Unit Tests
 
 ### Lavanya Shankar
