@@ -86,7 +86,7 @@ SmartSpender is a web application designed to help users manage their personal f
 
 ### In Scope
 - User authentication and session management.
-- Transaction management (add/edit/delete).
+- Transaction management (add/delete).
 - Budget tracking and alerts.
 - Financial report generation and visualization.
 
