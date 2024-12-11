@@ -3,15 +3,23 @@ import axios from 'axios';
 
 const BudgetSetter = () => {
     const [budget, setBudget] = useState('');
+    const [loading, setLoading] = useState(false); // For handling loading state
+    const [errorMessage, setErrorMessage] = useState(''); // For error handling
+    const [successMessage, setSuccessMessage] = useState(''); // For success feedback
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true); // Set loading to true
+        setErrorMessage(''); // Clear previous errors
+        setSuccessMessage(''); // Clear previous success messages
+
         try {
             // Retrieve token from localStorage
-            const token = localStorage.getItem('authToken');
+            const token = localStorage.getItem('token');
 
             if (!token) {
-                alert('You are not authenticated. Please log in.');
+                setErrorMessage('You are not authenticated. Please log in.');
+                setLoading(false);
                 return;
             }
 
@@ -23,12 +31,20 @@ const BudgetSetter = () => {
             };
 
             // Send the request with headers and budget amount
-            await axios.post('http://localhost:3001/api/v1/budget/set', { amount: budget }, config);
+            const response = await axios.post(
+                'http://localhost:3001/api/v1/budget/set',
+                { amount: budget },
+                config
+            );
 
-            alert('Budget set successfully!');
+            setSuccessMessage(response.data.message || 'Budget set successfully!');
+            setBudget(''); // Clear the input field
         } catch (error) {
             console.error('Error saving budget:', error);
-            alert('Failed to save budget. Ensure you are logged in.');
+            const message = error.response?.data?.message || 'Failed to save budget. Ensure you are logged in.';
+            setErrorMessage(message);
+        } finally {
+            setLoading(false); // Set loading to false
         }
     };
 
@@ -48,6 +64,15 @@ const BudgetSetter = () => {
             <h1 style={{ marginBottom: '20px', color: '#333', fontSize: '28px', fontWeight: 'bold' }}>
                 Set Your Monthly Budget
             </h1>
+
+            {errorMessage && (
+                <p style={{ color: 'red', marginBottom: '20px' }}>{errorMessage}</p>
+            )}
+
+            {successMessage && (
+                <p style={{ color: 'green', marginBottom: '20px' }}>{successMessage}</p>
+            )}
+
             <form onSubmit={handleSubmit} style={{ marginBottom: '30px', textAlign: 'center' }}>
                 <label
                     htmlFor="budget"
@@ -78,18 +103,19 @@ const BudgetSetter = () => {
                 <br />
                 <button
                     type="submit"
+                    disabled={loading} // Disable the button while loading
                     style={{
                         padding: '10px 20px',
-                        backgroundColor: '#007BFF',
+                        backgroundColor: loading ? '#6c757d' : '#007BFF',
                         color: '#FFF',
                         border: 'none',
                         borderRadius: '5px',
-                        cursor: 'pointer',
+                        cursor: loading ? 'not-allowed' : 'pointer',
                         fontSize: '16px',
                         fontWeight: 'bold',
                     }}
                 >
-                    Set Budget
+                    {loading ? 'Setting Budget...' : 'Set Budget'}
                 </button>
             </form>
         </div>
