@@ -30,12 +30,21 @@
 - Backend
 
 ### Varshini Venkataraman
-- Income
-- Expense
-- Dashboard
-- Budget
-- Backend
-
+1. Login and Register Page
+Developed both frontend and backend functionalities for user authentication.
+Implemented JWT-based authentication for secure login and registration processes.
+Verified API paths and authentication flows using Postman to ensure smooth operation.
+2. Income and Expenses Page
+Created a fully functional Income and Expenses page with:
+Frontend: User-friendly interface to input and view data.
+Backend: API endpoints to handle data submission and retrieval.
+Designed and integrated MongoDB models to manage user-specific income and expense data.
+3. Dashboard
+Developed an interactive Dashboard page that provides:
+Charts to visually represent financial data (e.g., income vs expenses).
+Transaction History to track and display all user transactions.
+Ensured a responsive and dynamic user experience with seamless data integration.
+Kindly click here: https://github.com/varshiniv1/SmartSpender/tree/main to view my contributions that were overwritten.
 
 ### issue in commit history
 - Our teammate Varshini Venkataraman had made many commits initially.
