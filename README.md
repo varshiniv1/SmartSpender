@@ -4,6 +4,10 @@ SmartSpender is a web application designed to help users manage their personal f
 
 ---
 
+### Demo Video - https://www.loom.com/share/93af1ccaea57418ea971a208e51ac155?sid=0a9761fe-3fa9-4c74-8b17-92af4b006a6b
+
+---
+
 ## Key Features
 
 ### Core Functionalities
