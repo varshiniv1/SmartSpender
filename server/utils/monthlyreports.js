@@ -7,7 +7,7 @@ const now = new Date();
 const fiveMinutesLater = new Date(now.getTime() + 1 * 60 * 1000);
 //'0 0 1 * *'
 const sendMonthlyReports = () => {
-  schedule.scheduleJob(fiveMinutesLater, async () => { // Run on the first of every month
+  schedule.scheduleJob('0 0 1 * *', async () => { // Run on the first of every month
     try {
       const users = await User.find();
 

@@ -20,6 +20,7 @@
 - Budget
 - Frontend
 - Backend
+- Backend Testing
 
 ### Kavisha Parikh
 - Email Notifications
