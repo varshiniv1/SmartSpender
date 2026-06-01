@@ -1,7 +1,7 @@
-import React, { useContext, useState, useEffect } from "react";
-import axios from "axios";
+import React, { useContext, useState, useEffect, useCallback } from 'react';
+import axios from 'axios';
 
-const BASE_URL = "http://localhost:3001/api/v1/tran/"; // Make sure the URL structure matches your backend
+const BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api/v1';
 
 const GlobalContext = React.createContext();
 
@@ -10,122 +10,103 @@ export const GlobalProvider = ({ children }) => {
   const [expenses, setExpenses] = useState([]);
   const [error, setError] = useState(null);
 
-  // Get the token from localStorage
-  const token = localStorage.getItem("token");
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem('token');
+    return { Authorization: token ? `Bearer ${token}` : '' };
+  };
 
-  // Helper function to handle token expiration
-  const handleTokenError = (err) => {
-    if (err.response && err.response.status === 401) {
-      // Token expired or invalid
-      setError("Session expired. Please log in again.");
-      localStorage.removeItem("token"); // Remove expired token
-      window.location.href = "/login"; // Redirect to login page or perform any action
+  const handleAuthError = (err) => {
+    if (err.response?.status === 401) {
+      localStorage.removeItem('token');
+      window.location.href = '/login';
     } else {
-      setError(err.response ? err.response.data.message : "An error occurred.");
+      setError(err.response?.data?.message || 'An error occurred.');
     }
   };
 
-  // Set up axios headers with JWT token
-  const axiosInstance = axios.create({
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: token ? `Bearer ${token}` : "", // Ensure token is present
-    },
-  });
-
-  // Fetch incomes from the backend
-  const getIncomes = async () => {
+  const getIncomes = useCallback(async () => {
     try {
-      const response = await axiosInstance.get(`${BASE_URL}get-incomes`);
-      setIncomes(response.data);
-      console.log(response.data);
+      const { data } = await axios.get(`${BASE_URL}/tran/get-incomes`, {
+        headers: getAuthHeaders(),
+      });
+      setIncomes(data);
     } catch (err) {
-      handleTokenError(err); // Handle errors (token expired, etc.)
+      handleAuthError(err);
     }
-  };
+  }, []);
 
-  // Fetch expenses from the backend
-  const getExpenses = async () => {
+  const getExpenses = useCallback(async () => {
     try {
-      const response = await axiosInstance.get(`${BASE_URL}get-expenses`);
-      setExpenses(response.data);
-      console.log(response.data);
+      const { data } = await axios.get(`${BASE_URL}/tran/get-expenses`, {
+        headers: getAuthHeaders(),
+      });
+      setExpenses(data);
     } catch (err) {
-      handleTokenError(err); // Handle errors (token expired, etc.)
+      handleAuthError(err);
     }
-  };
+  }, []);
 
-  // Add income
   const addIncome = async (income) => {
     try {
-      await axiosInstance.post(`${BASE_URL}add-income`, income);
-      getIncomes(); // Refresh the list of incomes after adding
+      await axios.post(`${BASE_URL}/tran/add-income`, income, {
+        headers: getAuthHeaders(),
+      });
+      await getIncomes();
     } catch (err) {
-      handleTokenError(err); // Handle errors (token expired, etc.)
+      handleAuthError(err);
     }
   };
 
-  // Delete income
   const deleteIncome = async (id) => {
     try {
-      await axiosInstance.delete(`${BASE_URL}delete-income/${id}`);
-      getIncomes(); // Refresh the list of incomes after deletion
+      await axios.delete(`${BASE_URL}/tran/delete-income/${id}`, {
+        headers: getAuthHeaders(),
+      });
+      await getIncomes();
     } catch (err) {
-      handleTokenError(err); // Handle errors (token expired, etc.)
+      handleAuthError(err);
     }
   };
 
-  // Add expense
   const addExpense = async (expense) => {
     try {
-      await axiosInstance.post(`${BASE_URL}add-expense`, expense);
-      getExpenses(); // Refresh the list of expenses after adding
+      await axios.post(`${BASE_URL}/tran/add-expense`, expense, {
+        headers: getAuthHeaders(),
+      });
+      await getExpenses();
     } catch (err) {
-      handleTokenError(err); // Handle errors (token expired, etc.)
+      handleAuthError(err);
     }
   };
 
-  // Delete expense
   const deleteExpense = async (id) => {
     try {
-      await axiosInstance.delete(`${BASE_URL}delete-expense/${id}`);
-      getExpenses(); // Refresh the list of expenses after deletion
+      await axios.delete(`${BASE_URL}/tran/delete-expense/${id}`, {
+        headers: getAuthHeaders(),
+      });
+      await getExpenses();
     } catch (err) {
-      handleTokenError(err); // Handle errors (token expired, etc.)
+      handleAuthError(err);
     }
   };
 
-  // Calculate total income
-  const totalIncome = () => {
-    return incomes.reduce((total, income) => total + income.amount, 0);
-  };
+  const totalIncome = () => incomes.reduce((total, i) => total + i.amount, 0);
+  const totalExpenses = () => expenses.reduce((total, e) => total + e.amount, 0);
+  const totalBalance = () => totalIncome() - totalExpenses();
 
-  // Calculate total expenses
-  const totalExpenses = () => {
-    return expenses.reduce((total, expense) => total + expense.amount, 0);
-  };
-
-  // Calculate total balance (income - expenses)
-  const totalBalance = () => {
-    return totalIncome() - totalExpenses();
-  };
-
-  // Get the last 3 transactions (incomes + expenses)
   const transactionHistory = () => {
     const history = [...incomes, ...expenses];
-    history.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); // Sort by date (descending)
-    return history.slice(0, 3); // Get the last 3 transactions
+    history.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    return history.slice(0, 5);
   };
 
-  // Fetch data on initial load
   useEffect(() => {
+    const token = localStorage.getItem('token');
     if (token) {
       getIncomes();
       getExpenses();
-    } else {
-      setError("Unauthorized: Please log in.");
     }
-  }, [token]);
+  }, [getIncomes, getExpenses]);
 
   return (
     <GlobalContext.Provider
@@ -151,6 +132,4 @@ export const GlobalProvider = ({ children }) => {
   );
 };
 
-export const useGlobalContext = () => {
-  return useContext(GlobalContext);
-};
+export const useGlobalContext = () => useContext(GlobalContext);

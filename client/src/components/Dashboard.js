@@ -5,58 +5,108 @@ import { dollar } from '../utils/icons.js';
 import Chart from './Chart.js';
 
 function Dashboard() {
-    const { totalExpenses, incomes, expenses, totalIncome, totalBalance, getIncomes, getExpenses } = useGlobalContext();
+  const { totalExpenses, incomes, expenses, totalIncome, totalBalance, getIncomes, getExpenses } =
+    useGlobalContext();
 
-    useEffect(() => {
-        getIncomes();
-        getExpenses();
-    }, []); // Empty dependency array ensures this runs once on component mount
+  useEffect(() => {
+    getIncomes();
+    getExpenses();
+  }, []);
 
-    return (
-        <div className="container-fluid">
-            <h1>All Transactions</h1>
-            <div className="row">
-                <div className="col-md-8">
-                    <div className="row">
-                        <div className="col-12">
-                            <Chart />
-                        </div>
-                        <div className="col-12 d-flex justify-content-between mt-3">
-                            <div className="bg-light p-3 rounded shadow-sm w-48">
-                                <h2>Total Income</h2>
-                                <p>{dollar} {totalIncome()}</p>
-                            </div>
-                            <div className="bg-light p-3 rounded shadow-sm w-48">
-                                <h2>Total Expense</h2>
-                                <p>{dollar} {totalExpenses()}</p>
-                            </div>
-                            <div className="bg-light p-3 rounded shadow-sm w-48">
-                                <h2>Total Balance</h2>
-                                <p>{dollar} {totalBalance()}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div className="col-md-4">
-                    <History />
-                    <div className="mt-3">
-                        <h2 className="salary-title">Min <span>Salary</span>Max</h2>
-                        <div className="salary-item bg-light p-3 rounded shadow-sm d-flex justify-content-between">
-                            <p>${Math.min(...incomes.map(item => item.amount))}</p>
-                            <p>${Math.max(...incomes.map(item => item.amount))}</p>
-                        </div>
-                    </div>
-                    <div className="mt-3">
-                        <h2 className="salary-title">Min <span>Expense</span>Max</h2>
-                        <div className="salary-item bg-light p-3 rounded shadow-sm d-flex justify-content-between">
-                            <p>${Math.min(...expenses.map(item => item.amount))}</p>
-                            <p>${Math.max(...expenses.map(item => item.amount))}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+  const balance = totalBalance();
+  const balanceColor = balance >= 0 ? '#42AD00' : 'red';
+
+  return (
+    <div className="container-fluid py-4">
+      <h1 style={{ color: 'rgba(34,34,96,1)' }}>Dashboard</h1>
+
+      <div className="row g-3 mb-4">
+        <div className="col-md-4">
+          <div
+            className="p-3 rounded-4 shadow-sm text-center"
+            style={{ background: 'rgba(252,246,249,0.9)', border: '2px solid #fff' }}
+          >
+            <p className="mb-1 text-muted small">Total Income</p>
+            <h3 style={{ color: '#42AD00' }}>
+              {dollar} {totalIncome().toLocaleString()}
+            </h3>
+          </div>
         </div>
-    );
+        <div className="col-md-4">
+          <div
+            className="p-3 rounded-4 shadow-sm text-center"
+            style={{ background: 'rgba(252,246,249,0.9)', border: '2px solid #fff' }}
+          >
+            <p className="mb-1 text-muted small">Total Expenses</p>
+            <h3 style={{ color: 'red' }}>
+              {dollar} {totalExpenses().toLocaleString()}
+            </h3>
+          </div>
+        </div>
+        <div className="col-md-4">
+          <div
+            className="p-3 rounded-4 shadow-sm text-center"
+            style={{ background: 'rgba(252,246,249,0.9)', border: '2px solid #fff' }}
+          >
+            <p className="mb-1 text-muted small">Total Balance</p>
+            <h3 style={{ color: balanceColor }}>
+              {dollar} {balance.toLocaleString()}
+            </h3>
+          </div>
+        </div>
+      </div>
+
+      <div className="row g-3">
+        <div className="col-md-8">
+          <div
+            className="p-3 rounded-4 shadow-sm mb-3"
+            style={{ background: 'rgba(252,246,249,0.9)', border: '2px solid #fff' }}
+          >
+            <Chart />
+          </div>
+
+          <div className="row g-3">
+            <div className="col-6">
+              <div
+                className="p-3 rounded-4 shadow-sm"
+                style={{ background: 'rgba(252,246,249,0.9)', border: '2px solid #fff' }}
+              >
+                <p className="text-muted small mb-2">Income Range</p>
+                <div className="d-flex justify-content-between">
+                  <span style={{ color: '#42AD00' }} className="fw-semibold">
+                    Min: ${incomes.length ? Math.min(...incomes.map((i) => i.amount)).toLocaleString() : 0}
+                  </span>
+                  <span style={{ color: '#42AD00' }} className="fw-semibold">
+                    Max: ${incomes.length ? Math.max(...incomes.map((i) => i.amount)).toLocaleString() : 0}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div className="col-6">
+              <div
+                className="p-3 rounded-4 shadow-sm"
+                style={{ background: 'rgba(252,246,249,0.9)', border: '2px solid #fff' }}
+              >
+                <p className="text-muted small mb-2">Expense Range</p>
+                <div className="d-flex justify-content-between">
+                  <span style={{ color: 'red' }} className="fw-semibold">
+                    Min: ${expenses.length ? Math.min(...expenses.map((e) => e.amount)).toLocaleString() : 0}
+                  </span>
+                  <span style={{ color: 'red' }} className="fw-semibold">
+                    Max: ${expenses.length ? Math.max(...expenses.map((e) => e.amount)).toLocaleString() : 0}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="col-md-4">
+          <History />
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default Dashboard;

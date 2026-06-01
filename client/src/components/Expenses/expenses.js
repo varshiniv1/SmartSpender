@@ -4,59 +4,50 @@ import IncomeItem from '../IncomeItem';
 import ExpenseForm from './expenseForm.js';
 
 function Expenses() {
-    const { expenses, getExpenses, deleteExpense, totalExpenses } = useGlobalContext();
+  const { expenses, getExpenses, deleteExpense, totalExpenses } = useGlobalContext();
 
-    useEffect(() => {
-        getExpenses();
-    }, []);
+  useEffect(() => {
+    getExpenses();
+  }, []);
 
-    return (
-        <div className="container py-4">
-            <h1>Expenses</h1>
-            <h2 className="text-center bg-light p-3 rounded-3 shadow-sm mb-4">
-                Total Expense: <span className="fw-bold text-success fs-3">${totalExpenses()}</span>
-            </h2>
-            <div className="d-flex gap-4">
-                <div className="flex-column" style={{ width: '300px' }}>
-                    <ExpenseForm />
-                </div>
-                <div className="flex-grow-1">
-                    {expenses.map((expense) => {
-                        const { _id, title, amount, date, category, description, type } = expense;
-                        return (
-                            <div className="card mb-3" key={_id}>
-                                <div className="card-body">
-                                    <h5 className="card-title">{title}</h5>
-                                    <p className="card-text">{description}</p>
-                                    <p className="card-text">
-                                        <small className="text-muted">Date: {date}</small>
-                                    </p>
-                                    <p className="card-text">
-                                        <span className="fw-bold">Amount: </span>
-                                        ${amount}
-                                    </p>
-                                    <p className="card-text">
-                                        <span className="fw-bold">Category: </span>
-                                        {category}
-                                    </p>
-                                    <p className="card-text">
-                                        <span className="fw-bold">Type: </span>
-                                        {type}
-                                    </p>
-                                    <button 
-                                        className="btn btn-danger" 
-                                        onClick={() => deleteExpense(_id)}
-                                    >
-                                        Delete
-                                    </button>
-                                </div>
-                            </div>
-                        );
-                    })}
-                </div>
-            </div>
+  return (
+    <div className="container py-4">
+      <h1 style={{ color: 'rgba(34,34,96,1)' }}>Expenses</h1>
+      <h2
+        className="text-center p-3 rounded-4 shadow-sm mb-4"
+        style={{ background: 'rgba(252,246,249,0.9)', border: '2px solid #fff', color: 'rgba(34,34,96,1)' }}
+      >
+        Total Expenses:{' '}
+        <span className="fw-bold" style={{ color: 'red' }}>
+          ${totalExpenses().toLocaleString()}
+        </span>
+      </h2>
+      <div className="d-flex gap-4">
+        <div style={{ width: '320px', flexShrink: 0 }}>
+          <ExpenseForm />
         </div>
-    );
+        <div className="flex-grow-1">
+          {expenses.length === 0 && (
+            <p className="text-muted">No expense entries yet. Add one on the left!</p>
+          )}
+          {expenses.map((expense) => (
+            <IncomeItem
+              key={expense._id}
+              id={expense._id}
+              title={expense.title}
+              amount={expense.amount}
+              date={expense.date}
+              category={expense.category}
+              description={expense.description}
+              type={expense.type}
+              indicatorColor="red"
+              deleteItem={deleteExpense}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default Expenses;

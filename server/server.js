@@ -1,55 +1,43 @@
 import express from 'express';
 import cors from 'cors';
+import helmet from 'helmet';
 import mongoose from 'mongoose';
-import { readdirSync } from 'fs';
 import dotenv from 'dotenv';
-import router from './routes/index.routes.js'
+import router from './routes/index.routes.js';
 
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT;
 
-// Middlewares
+app.use(helmet());
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: process.env.CLIENT_URL || 'http://localhost:3000',
+  credentials: true,
+}));
 
 const connectToMongoDB = async () => {
-    try {
-      // Check if MONGO environment variable is defined
-      if (!process.env.MONGO) {
-        throw new Error('MONGO environment variable is not defined');
-      }
-  
-      await mongoose.connect(process.env.MONGO);
-      console.log('Connected to MongoDB');
-    } catch (error) {
-      console.error('Error connecting to MongoDB:', error);
-      process.exit(1); // Exit the process with an error
-    }
-  };
-  
-  // MongoDB connection event listeners
-  mongoose.connection.on('disconnected', () => {
-    console.log('MongoDB disconnected');
-  });
-  
-  mongoose.connection.on('connected', () => {
-    console.log('MongoDB connected');
-  });
-
-// Routes
-app.use('/api/v1', router);
-
-// Start server
-const startServer = async () => {
-  await connectToMongoDB(); // Wait for the connection to be established
-  
-  const port = process.env.PORT || 3001;
-  app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
-  });
+  if (!process.env.MONGO) {
+    throw new Error('MONGO environment variable is not defined');
+  }
+  await mongoose.connect(process.env.MONGO);
+  console.log('Connected to MongoDB');
 };
 
-// Execute the server startup
+mongoose.connection.on('disconnected', () => console.log('MongoDB disconnected'));
+mongoose.connection.on('connected', () => console.log('MongoDB connected'));
+
+app.use('/api/v1', router);
+
+const startServer = async () => {
+  try {
+    await connectToMongoDB();
+    const port = process.env.PORT || 3001;
+    app.listen(port, () => console.log(`Server running on port ${port}`));
+  } catch (error) {
+    console.error('Failed to start server:', error);
+    process.exit(1);
+  }
+};
+
 startServer();
